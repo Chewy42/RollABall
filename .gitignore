@@ -1,0 +1,13 @@
+/.DS_Store
+/.idea
+/.vs
+/.vscode
+/.vsconfig
+/Assembly-CSharp.csproj
+/Library
+/Logs
+/RollABall.sln
+/Temp
+/UserSettings
+/bullethell.unitypackage
+/obj
