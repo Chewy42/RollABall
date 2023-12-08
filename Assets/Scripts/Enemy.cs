@@ -1,5 +1,7 @@
 // Import necessary libraries
 using UnityEngine;
+using System.Collections;
+
 
 // Base class for all enemy types
 public class Enemy : MonoBehaviour
@@ -66,25 +68,25 @@ public class Enemy : MonoBehaviour
         transform.position += direction * speed * Time.deltaTime;
     }
 
-    public virtual void TakeDamage(float damage)
+    private bool canHit = true;
+
+    private IEnumerator HitCooldown()
     {
-        health -= damage;
-        if (!IsAlive())
-        {
-            Die();
-        }
+        canHit = false;
+        yield return new WaitForSeconds(1f);
+        canHit = true;
     }
 
     private void OnCollisionEnter(Collision other)
     {
+        if (!canHit) return;
+
         Vector3 pointOfContact = other.contacts[0].point;
         if (other.gameObject.CompareTag("Projectile"))
         {
-            TakeDamage(other.gameObject.GetComponent<Projectile>().GetDamage());
-            // make xp orb at point of contect
-            GameObject xpOrb = Instantiate(XP_Prefab, pointOfContact, Quaternion.identity);
-            xpOrb.transform.parent = XP_Parent;
-            if (!IsAlive()) Die();
+            health -= other.gameObject.GetComponent<Projectile>().GetDamage();
+            if (!IsAlive()) Die(pointOfContact);
+            StartCoroutine(HitCooldown());
         }
     }
 
@@ -94,7 +96,7 @@ public class Enemy : MonoBehaviour
     }
 
     // Check whether the enemy is still alive
-    protected bool IsAlive()
+    public bool IsAlive()
     {
         return health >= 0;
     }
@@ -102,14 +104,28 @@ public class Enemy : MonoBehaviour
     // Check if the enemy has fallen off the map
     private void CheckForFallOffMap()
     {
-        if (transform.position.y < _floor.position.y - 15f)
+        if (transform.position.y < -10)
         {
-            Die();
+            DieFromFall();
         }
     }
 
     // Method called when the enemy dies
-    protected void Die()
+    protected void Die(Vector3 pointOfContact)
+    {
+        // if point of contact is outside of -10 to 20 from 0 in every direction, spawn xp orb at closest point inside of that range
+        if (pointOfContact.x < -10 || pointOfContact.x > 10 || pointOfContact.z < -10 || pointOfContact.z > 10)
+        {
+            pointOfContact.x = Mathf.Clamp(pointOfContact.x, -10, 10);
+            pointOfContact.z = Mathf.Clamp(pointOfContact.z, -10, 10);
+        }
+        GameObject xpOrb = Instantiate(XP_Prefab, pointOfContact, Quaternion.identity);
+        xpOrb.transform.parent = XP_Parent;
+        playerController.OnEnemyKilled();
+        Destroy(gameObject);
+    }
+
+    protected void DieFromFall()
     {
         playerController.OnEnemyKilled();
         Destroy(gameObject);

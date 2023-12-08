@@ -5,26 +5,23 @@ using UnityEngine;
 public class UpgradeManager : MonoBehaviour
 {
     public PlayerController playerController;
-    public GameController gameController;
+    public GameStateManager gameStateManager;
     public GameView gameView;
 
-    public void UpgradeHealth()
+    public void UpgradeDamage()
     {
-        print("Upgrading Health");
-        playerController.SetMaxHealth(playerController.GetMaxHealth() + 1f);
+        playerController.SetDamage(playerController.GetDamage() + 1);
         DoneLevelingUp();
     }
 
     public void UpgradeSpeed()
     {
-        print("Upgrading Speed");
         playerController.SetSpeed(playerController.GetSpeed() + 1f);
         DoneLevelingUp();
     }
 
     public void UpgradeProjectileShots()
     {
-        print("Upgrading Projectile Shots");
         playerController.SetProjectileShots(playerController.GetProjectileShots() + 1);
         DoneLevelingUp();
     }
@@ -32,7 +29,9 @@ public class UpgradeManager : MonoBehaviour
     private void DoneLevelingUp()
     {
         playerController.SetIsCurrentlyLevelingUp(false);
-        gameController.ResumeGame();
+        playerController.SetCanShoot(true);
+        playerController.StartCoroutine(playerController.AutoShoot());
+        gameStateManager.ChangeState(GameStateManager.GameStates.GamePlaying);
         gameView.HideLevelUpView();
     }
 }

@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour
 
     IEnumerator Countdown()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         Destroy(gameObject);
     }
 

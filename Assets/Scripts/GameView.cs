@@ -10,9 +10,11 @@ public class GameView : MonoBehaviour
     public Text killsText;
     public Text healthText;
     public Text playerLevelText;
+    public Text levelText;
 
     [Header("References")]
     public CanvasGroup LevelUpView;
+    public CanvasGroup ResultsView;
     public PlayerController playerController;
     public GameController gameController;
 
@@ -26,22 +28,20 @@ public class GameView : MonoBehaviour
 
     void Update()
     {
-        if (gameController.IsGameOver())
-        {
-            resultText.text = "Game Over!";
-        }
-        else if (gameController.IsGameWon())
-        {
-            resultText.text = "You Win!";
-        }
-        else
-        {
-            resultText.text = "";
-        }
-
         SetKillsText(playerController.GetKills());
         SetHealthText((int)Math.Round(playerController.GetHealth()));
         SetPlayerLevelText(playerController.GetPlayerLevel());
+    }
+
+    public void ShowResults(string result)
+    {
+        resultText.text = result;
+        ShowCanvasGroup(ResultsView);
+    }
+
+    public void HideResults()
+    {
+        HideCanvasGroup(ResultsView);
     }
 
     public void ShowLevelUpView()
@@ -54,6 +54,10 @@ public class GameView : MonoBehaviour
         HideCanvasGroup(LevelUpView);
     }
    
+   public void SetLevelText(int count)
+    {
+        levelText.text = "Level: " + count;
+    }
 
     public void SetTimerText(int count)
     {

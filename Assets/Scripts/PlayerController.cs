@@ -8,13 +8,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _maxHealth;
     [SerializeField] private float _health;
     [SerializeField] private float _speed;
+    [SerializeField] private int _damage;
     [SerializeField] private int _projectileShots = 1;
     [SerializeField] private float _projectileCooldown = 2f;
-    [SerializeField] private float _jumpCooldown = 3f;
+    [SerializeField] private float _jumpCooldown = 2f;
     [SerializeField] private int _playerLevel = 1;
     [SerializeField] private float _playerXP = 0;
     [SerializeField] private float _playerXPToNextLevel = 5f;
     [SerializeField] private int _kills = 0;
+    [SerializeField] private bool _canShoot = true;
 
 
     [Header("References")]
@@ -22,16 +24,17 @@ public class PlayerController : MonoBehaviour
     public GameObject enemiesParent;
     public GameView gameView;
     public GameObject projectile;
+    public GameStateManager gameStateManager;
+    public GameController gameController;
+    public LevelManager levelManager;
 
     [Header("Other")]
     private Rigidbody rb;
-    private GameController gameController;
     private Vector3 pos;
     private bool _isCurrentlyLevelingUp = false;
 
     private void Start()
     {
-        gameController = GetComponentInParent<GameController>();
 
         _health = 50f;
         rb = GetComponent<Rigidbody>();
@@ -74,7 +77,7 @@ public class PlayerController : MonoBehaviour
         if (_jumpCooldown <= 0 && transform.position.y == 1)
         {
             rb.AddForce(Vector3.up * 250f);
-            _jumpCooldown = 3f;
+            _jumpCooldown = 2f;
         }
         else if (transform.position.y != 1)
         {
@@ -92,16 +95,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private IEnumerator AutoShoot()
+    public IEnumerator AutoShoot()
     {
-        while (true)
+        while (_canShoot)
         {
-            if(gameController.IsGamePlaying())
-            {
-                ShootClosestEnemy();
-            }else{
-                print("Cant shoot!");
-            }
+            ShootClosestEnemy();
             yield return new WaitForSeconds(_projectileCooldown);
         }
     }
@@ -139,8 +137,8 @@ public class PlayerController : MonoBehaviour
     {
         GameObject bullet = Instantiate(projectile, pos, Quaternion.identity);
         bullet.transform.parent = projectileParent;
-        bullet.GetComponent<Projectile>().SetDamage(1f);
-        bullet.GetComponent<Rigidbody>().velocity = direction * 50f;
+        bullet.GetComponent<Projectile>().SetDamage(_damage);
+        bullet.GetComponent<Rigidbody>().velocity = direction * 69f;
         return bullet;
     }
 
@@ -225,15 +223,14 @@ public class PlayerController : MonoBehaviour
         _playerXPToNextLevel *= 1.5f;
         _health = _maxHealth;
         gameView.SetPlayerLevelText(_playerLevel);
-        gameController.InitializeLevelUp();
+        _canShoot = false;
+        levelManager.StartLevelUp();
     }
-
-    
 
     private void Lose()
     {
         transform.position = new Vector3(0f, 0f, 0f);
-        gameController.Lose();
+        gameController.GameLost();
     }
 
     private void CheckForFallOffMap()
@@ -242,6 +239,11 @@ public class PlayerController : MonoBehaviour
         {
             Lose();
         }
+    }
+
+    public void SetCanShoot(bool value)
+    {
+        _canShoot = value;
     }
 
     public bool IsAlive()
@@ -274,14 +276,14 @@ public class PlayerController : MonoBehaviour
         return _playerLevel;
     }
 
-    public float GetMaxHealth()
+    public int GetDamage()
     {
-        return _maxHealth;
+        return _damage;
     }
 
-    public void SetMaxHealth(float amount)
+    public void SetDamage(int amount)
     {
-        _maxHealth = amount;
+        _damage = amount;
     }
 
     public float GetSpeed()
