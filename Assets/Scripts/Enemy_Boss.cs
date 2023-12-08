@@ -5,8 +5,8 @@ public class Enemy_Boss : Enemy
 {
     [Header("Boss Specific")]
     [SerializeField] private float rushCooldown = 2f;
-    [SerializeField] private float rushSpeed = 10f;
-    [SerializeField] private float rushSpeedMultiplier = 5f;
+    [SerializeField] private float rushSpeed = 4f;
+    [SerializeField] private float rushSpeedMultiplier = 3f;
     [SerializeField] private float rushAccelerationTime = 0.1f;
     [SerializeField] private float rushDecelerationTime = 0.2f;
     public bool IsFinalBoss { get; set; } = false;
@@ -24,6 +24,7 @@ public class Enemy_Boss : Enemy
         base.Start();
         speed = 2.25f;
         health = 15f;
+        damage = 8f;
         StartCoroutine(RushPlayerRoutine());
     }
 

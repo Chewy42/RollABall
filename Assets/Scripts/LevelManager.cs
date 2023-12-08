@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour
 
     public List<BaseLevel> levels;
 
-    private int _currentLevel = 0;
+    private int _currentLevel = 1;
 
     public void StartLevel(int level)
     {
@@ -26,20 +26,23 @@ private IEnumerator LevelRoutine(int level)
     ChangeEnemySpawnRate(level);
 
     List<float> bossSpawnTimes = new List<float>(currentLevel.GetBossSpawnTimes());
+    List<GameObject> prefabs = new List<GameObject>(currentLevel.GetPrefabs());
     int maxBosses = currentLevel.GetMaxBosses();
     float spawnRate = enemySpawner.GetSpawnRate();
 
-    float levelDuration = 60f; // Duration of the level in seconds
+    float levelDuration = 60f;
     float startTime = Time.time;
 
     while (Time.time - startTime < levelDuration)
     {
-        enemySpawner.SpawnEnemy();
+        int randomIndex = Random.Range(0, prefabs.Count);
+        GameObject prefab = prefabs[randomIndex];
 
-        // Spawn regular bosses at specified times before the final fight
+        enemySpawner.SpawnEnemy(prefab);
+
         if (bossSpawnTimes.Count > 0 && Time.time - startTime >= bossSpawnTimes[0])
         {
-            enemySpawner.SpawnBoss(false); // false indicates a regular boss
+            enemySpawner.SpawnBoss(false); 
             bossSpawnTimes.RemoveAt(0);
         }
 

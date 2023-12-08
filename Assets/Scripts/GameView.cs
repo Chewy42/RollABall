@@ -20,6 +20,8 @@ public class GameView : MonoBehaviour
 
     private void Start()
     {
+        HideResults();
+        levelText.text = "Wave: 1";
         resultText.text = "";
         killsText.text = "Kills: 0";
         healthText.text = "Health: " + playerController.GetHealth();
@@ -56,7 +58,7 @@ public class GameView : MonoBehaviour
    
    public void SetLevelText(int count)
     {
-        levelText.text = "Level: " + count;
+        levelText.text = "Wave: " + count;
     }
 
     public void SetTimerText(int count)

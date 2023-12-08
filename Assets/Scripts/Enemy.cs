@@ -13,12 +13,10 @@ public class Enemy : MonoBehaviour
     protected PlayerController playerController;
 
     // Settings for the enemy's speed and health
-    [SerializeField]
     protected float speed;
 
-    [SerializeField]
     protected float health;
-    [SerializeField]
+
     protected float damage;
 
     private Transform _floor;

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private List<Transform> enemySpawnPoints;
     [SerializeField] private GameObject enemySpawnPointsGameObject;
     [SerializeField] private GameObject enemiesParent;
-    [SerializeField] private float spawnRate;
     [SerializeField] private List<GameObject> enemies;
+    private float spawnRate;
     private int _boss_count = 0;
     private bool _spawnerReady = false;
 
@@ -18,14 +17,15 @@ public class EnemySpawner : MonoBehaviour
         InitializeEnemySpawnPoints();
     }
 
-public void SpawnEnemy()
+public void SpawnEnemy(GameObject prefab)
 {
     if (!_spawnerReady || enemySpawnPoints.Count == 0) return;
 
     int randomIndex = UnityEngine.Random.Range(0, enemySpawnPoints.Count);
-    GameObject enemy = Instantiate(enemyPrefab, enemySpawnPoints[randomIndex].position, Quaternion.identity, enemiesParent.transform);
+    GameObject enemy = Instantiate(prefab, enemySpawnPoints[randomIndex].position, Quaternion.identity, enemiesParent.transform);
     enemies.Add(enemy);
 }
+
 
 public Enemy_Boss SpawnBoss(bool isFinalBoss)
 {

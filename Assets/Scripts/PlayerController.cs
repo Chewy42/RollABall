@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Player Attributes")]
-    [SerializeField] private float _maxHealth;
-    [SerializeField] private float _health;
-    [SerializeField] private float _speed;
-    [SerializeField] private int _damage;
-    [SerializeField] private int _projectileShots = 1;
-    [SerializeField] private float _projectileCooldown = 2f;
-    [SerializeField] private float _jumpCooldown = 2f;
-    [SerializeField] private int _playerLevel = 1;
-    [SerializeField] private float _playerXP = 0;
-    [SerializeField] private float _playerXPToNextLevel = 5f;
-    [SerializeField] private int _kills = 0;
-    [SerializeField] private bool _canShoot = true;
+    private float _maxHealth = 50f;
+    private float _health = 50f;
+    private float _speed = 3f;
+    private int _damage = 1;
+    private int _projectileShots = 1;
+    private float _projectileCooldown = 2f;
+    private int _playerLevel = 1;
+    private float _playerXP = 0;
+    private float _playerXPToNextLevel = 5f;
+    private int _kills = 0;
+    private bool _canShoot = true;
 
 
     [Header("References")]
@@ -32,6 +30,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Vector3 pos;
     private bool _isCurrentlyLevelingUp = false;
+    private bool _isJumping = false;
+    private float _jumpForce = 250f;
+    private float _jumpCooldown = 0.5f;
+    private float _groundedThreshold = 0.5f; 
+    private float _lastJumpTime = 0f;
 
     private void Start()
     {
@@ -44,10 +47,10 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(AutoShoot());
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         MovePlayer();
-        CheckForFallOffMap();
+        CheckForJumpInput();
     }
 
     private void MovePlayer()
@@ -62,38 +65,35 @@ public class PlayerController : MonoBehaviour
             Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
 
             rb.AddForce(movement * _speed);
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                StartCoroutine(Jump());
-            }
-        }else{
+        }
+        else
+        {
             rb.velocity = Vector3.zero;
         }
     }
 
-    private IEnumerator Jump()
+    private void CheckForJumpInput()
     {
-        if (_jumpCooldown <= 0 && transform.position.y == 1)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.AddForce(Vector3.up * 250f);
-            _jumpCooldown = 2f;
-        }
-        else if (transform.position.y != 1)
-        {
-            Debug.Log("Player is not on the ground!");
-        }
-        else
-        {
-            Debug.Log("Jump is on cooldown!");
-        }
-
-        while (_jumpCooldown > 0)
-        {
-            _jumpCooldown -= Time.deltaTime;
-            yield return null;
+            Jump();
         }
     }
+
+    private void Jump()
+    {
+        if (!_isJumping && IsGrounded())
+        {
+            _isJumping = true;
+            rb.AddForce(Vector3.up * _jumpForce);
+        }
+    }
+
+     private bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, -Vector3.up, _groundedThreshold);
+    }
+
 
     public IEnumerator AutoShoot()
     {
@@ -184,6 +184,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
+        if (other.gameObject.CompareTag("Floor"))
+        {
+            _isJumping = false;
+        }
         if (other.gameObject.CompareTag("Enemy"))
         {
             _health -= other.gameObject.GetComponent<Enemy>().GetDamage();
