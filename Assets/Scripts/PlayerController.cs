@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     private float _maxHealth = 50f;
     private float _health = 50f;
-    private float _speed = 3f;
+    private float _speed = 10f;
     private int _damage = 1;
     private int _projectileShots = 1;
     private float _projectileCooldown = 2f;
@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("References")]
+    public GameObject upgradeEffect;
     public Transform projectileParent;
     public GameObject enemiesParent;
     public GameView gameView;
@@ -38,7 +39,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-
+    
+        upgradeEffect.SetActive(false);
         _health = 50f;
         rb = GetComponent<Rigidbody>();
 
@@ -47,7 +49,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(AutoShoot());
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         MovePlayer();
         CheckForJumpInput();
@@ -219,6 +221,13 @@ public class PlayerController : MonoBehaviour
         GetComponent<Renderer>().material.color = Color.white;
     }
 
+    public IEnumerator FlashUpgradeEffect()
+    {
+        upgradeEffect.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        upgradeEffect.SetActive(false);
+    }
+
     private void LevelUp()
     {
         _isCurrentlyLevelingUp = true;
@@ -228,7 +237,12 @@ public class PlayerController : MonoBehaviour
         _health = _maxHealth;
         gameView.SetPlayerLevelText(_playerLevel);
         _canShoot = false;
-        levelManager.StartLevelUp();
+        gameView.ShowLevelUpView();
+    }
+
+    public void OnLevelUpFinished()
+    {
+        StartCoroutine(FlashUpgradeEffect());
     }
 
     private void Lose()

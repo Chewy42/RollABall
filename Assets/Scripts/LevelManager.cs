@@ -49,7 +49,6 @@ private IEnumerator LevelRoutine(int level)
         yield return new WaitForSeconds(spawnRate);
     }
 
-    // Start the boss fight exactly at 60 seconds
     StartCoroutine(StartBossFight(maxBosses));
 }
 
@@ -73,13 +72,12 @@ private IEnumerator LevelRoutine(int level)
 
     while (defeatedBosses < maxBosses)
     {
-        Enemy_Boss boss = enemySpawner.SpawnBoss(true); // true indicates a final boss
+        Enemy_Boss boss = enemySpawner.SpawnBoss(true); 
         if (boss == null) yield break;
 
-        // Continue the game loop until the boss is defeated
         while (boss.IsAlive())
         {
-            yield return null; // Wait until the boss is defeated
+            yield return null; 
         }
 
         defeatedBosses++;
@@ -116,6 +114,11 @@ private IEnumerator LevelRoutine(int level)
     public int GetCurrentLevel()
     {
         return _currentLevel;
+    }
+
+    public bool IsLastLevel()
+    {
+        return _currentLevel == levels.Count;
     }
 
     private void PrepareNextLevel()

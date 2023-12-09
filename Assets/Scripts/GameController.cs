@@ -28,4 +28,12 @@ public class GameController : MonoBehaviour
     {
         gameStateManager.ChangeState(GameStateManager.GameStates.GameWon);
     }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 }

@@ -55,6 +55,7 @@ public class GameStateManager : MonoBehaviour
     {
         gameView.ShowResults("LOSE");
         enemySpawner.ClearEnemies();
+        ChangeState(GameStates.GameIntermission);
     }
 
     private void OnGamePaused()
@@ -73,8 +74,23 @@ public class GameStateManager : MonoBehaviour
     {
         CurrentState = GameStates.GameIntermission;
         simpleTimer.ResetTimer();
-        StartCoroutine(StartNextLevel());
+        //if on last level restart the game else go to next level
+        if (levelManager.IsLastLevel())
+        {
+            StartCoroutine(RestartGame());
+        }
+        else
+        {
+            StartCoroutine(StartNextLevel());
+        }
     }
+
+    private IEnumerator RestartGame()
+    {
+        yield return new WaitForSeconds(3f);
+        levelManager.SetCurrentLevel(1);
+    }
+
 
     IEnumerator StartNextLevel()
     {

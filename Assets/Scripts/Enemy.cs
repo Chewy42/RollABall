@@ -1,18 +1,14 @@
-// Import necessary libraries
 using UnityEngine;
 using System.Collections;
 
 
-// Base class for all enemy types
 public class Enemy : MonoBehaviour
 {
-    // References to important objects and components
     [Header("References")]
     protected XP xp;
     protected Transform playerPosition;
     protected PlayerController playerController;
 
-    // Settings for the enemy's speed and health
     protected float speed;
 
     protected float health;
@@ -93,13 +89,13 @@ public class Enemy : MonoBehaviour
         xp.XP_Amount = amount;
     }
 
-    // Check whether the enemy is still alive
+    
     public bool IsAlive()
     {
         return health >= 0;
     }
 
-    // Check if the enemy has fallen off the map
+    
     private void CheckForFallOffMap()
     {
         if (transform.position.y < -10)
@@ -108,10 +104,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Method called when the enemy dies
+    
     protected void Die(Vector3 pointOfContact)
     {
-        // if point of contact is outside of -10 to 20 from 0 in every direction, spawn xp orb at closest point inside of that range
+        
         if (pointOfContact.x < -10 || pointOfContact.x > 10 || pointOfContact.z < -10 || pointOfContact.z > 10)
         {
             pointOfContact.x = Mathf.Clamp(pointOfContact.x, -10, 10);

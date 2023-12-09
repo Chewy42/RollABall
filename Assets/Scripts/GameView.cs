@@ -54,6 +54,7 @@ public class GameView : MonoBehaviour
     public void HideLevelUpView()
     {
         HideCanvasGroup(LevelUpView);
+        playerController.OnLevelUpFinished();
     }
    
    public void SetLevelText(int count)
